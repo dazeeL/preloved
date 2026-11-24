@@ -1,0 +1,11 @@
+<?php
+ob_start();
+$pageTitle='Detail Produk'; require_once __DIR__.'/../includes/header.php';
+$id=(int)($_GET['id']??0); $product=null;
+if($conn){$s=$conn->prepare("SELECT p.*,c.name category_name FROM products p LEFT JOIN categories c ON c.id=p.category_id WHERE p.id=? AND p.status='available'");$s->bind_param('i',$id);$s->execute();$product=$s->get_result()->fetch_assoc();}
+else {foreach(getDummyProducts() as $p) if($p['id']==$id){$product=$p;break;}}
+if(!$product){http_response_code(404);}
+if($_SERVER['REQUEST_METHOD']==='POST' && $product){$qty=max(1,min((int)($_POST['quantity']??1),(int)$product['stock']));$_SESSION['cart']=$_SESSION['cart']??[];$_SESSION['cart'][$id]=min((int)($product['stock']??1),(int)($_SESSION['cart'][$id]??0)+$qty);setFlash('success','Produk ditambahkan ke keranjang.');redirect(BASE_URL.'/buyer/cart.php');}
+?>
+<section class="section"><div class="container"><?php if(!$product): ?><div class="empty-state"><h2>Produk tidak ditemukan</h2><a class="btn btn-primary" href="<?= BASE_URL ?>/buyer/">Kembali ke katalog</a></div><?php else: ?><a href="<?= BASE_URL ?>/buyer/" class="text-muted">← Kembali ke katalog</a><div class="product-detail"><div class="detail-image"><?php if($product['image']): ?><img src="<?= BASE_URL ?>/uploads/products/<?= sanitize($product['image']) ?>" alt="<?= sanitize($product['name']) ?>"><?php else: ?><span>♻️</span><?php endif; ?></div><div class="detail-content"><span class="product-category"><?= sanitize($product['category_name']??'Preloved') ?></span><h1><?= sanitize($product['name']) ?></h1><span class="badge <?= conditionClass($product['condition']) ?>"><?= conditionLabel($product['condition']) ?></span><div class="product-detail-price"><?= formatRupiah($product['price']) ?></div><p><?= nl2br(sanitize($product['description']??'Produk preloved pilihan.')) ?></p><p class="text-muted">Stok tersedia: <?= (int)$product['stock'] ?></p><form method="post" class="buy-form"><label for="quantity">Jumlah</label><input id="quantity" class="form-control" type="number" name="quantity" min="1" max="<?= (int)$product['stock'] ?>" value="1"><button class="btn btn-primary btn-lg">Tambah ke keranjang</button></form></div></div><?php endif; ?></div></section>
+<?php require_once __DIR__.'/../includes/footer.php'; ?>

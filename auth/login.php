@@ -72,14 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php endif; ?>
 
-        <?php if (!$conn): ?>
-            <div class="alert alert-warning">
-                ⚠️ Database belum terhubung. Gunakan akun demo untuk mencoba:
-                <br><strong>Admin:</strong> admin@preloved.com / admin123
-                <br><strong>Pembeli:</strong> buyer@preloved.com / buyer123
-            </div>
-        <?php endif; ?>
-
         <form method="POST" action="">
             <div class="form-group">
                 <label for="email">Email</label>

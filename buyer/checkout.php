@@ -2,7 +2,7 @@
 ob_start();
 $pageTitle='Checkout'; require_once __DIR__.'/../includes/header.php';
 if(!isLoggedIn()){setFlash('info','Masuk terlebih dahulu untuk melanjutkan checkout.');redirect(BASE_URL.'/auth/login.php');}
-$_SESSION['cart']=$_SESSION['cart']??[];$all=$conn?[]:getDummyProducts();
+$_SESSION['cart']=$_SESSION['cart']??[];$all=$conn?[]:array_merge(getDummyProducts(),array_values($_SESSION['demo_seller_products']??[]));
 if($conn){$ids=array_map('intval',array_keys($_SESSION['cart']));if($ids){$r=$conn->query('SELECT * FROM products WHERE id IN ('.implode(',',$ids).') AND status="available" AND stock>0');while($r&&$p=$r->fetch_assoc())$all[]=$p;}}
 $items=[];$total=0;foreach($all as $p)if(isset($_SESSION['cart'][$p['id']])){$qty=min((int)$_SESSION['cart'][$p['id']],(int)$p['stock']);if($qty){$p['quantity']=$qty;$p['subtotal']=$qty*$p['price'];$items[]=$p;$total+=$p['subtotal'];}}
 if(!$items){setFlash('info','Keranjang masih kosong.');redirect(BASE_URL.'/buyer/cart.php');}

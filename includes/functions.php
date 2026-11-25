@@ -12,6 +12,19 @@ function isBuyer() {
     return isLoggedIn() && $_SESSION['user_role'] === 'buyer';
 }
 
+function getUserStore() {
+    global $conn;
+    if (!$conn || !isLoggedIn()) return $_SESSION['demo_store'] ?? null;
+    $userId = (int)$_SESSION['user_id'];
+    $stmt = $conn->prepare('SELECT * FROM stores WHERE user_id = ? LIMIT 1');
+    if (!$stmt) return null;
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $store = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    return $store ?: null;
+}
+
 function redirect($url) {
     header("Location: $url");
     exit();

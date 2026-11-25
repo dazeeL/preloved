@@ -3,6 +3,8 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/functions.php';
 
 $pageTitle = $pageTitle ?? 'PreLoved Marketplace';
+$requestPath = str_replace('\\', '/', $_SERVER['PHP_SELF'] ?? '');
+$bodyClass = str_contains($requestPath, '/auth/') ? 'page-auth' : (str_contains($requestPath, '/admin/') ? 'page-admin' : (str_contains($requestPath, '/seller/') ? 'page-seller' : ''));
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -15,7 +17,7 @@ $pageTitle = $pageTitle ?? 'PreLoved Marketplace';
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
 </head>
-<body>
+<body class="<?= $bodyClass ?>">
     <nav class="navbar">
         <div class="container navbar-container">
             <a href="<?= BASE_URL ?>/" class="navbar-brand">
@@ -37,6 +39,7 @@ $pageTitle = $pageTitle ?? 'PreLoved Marketplace';
                         <a href="<?= BASE_URL ?>/auth/logout.php" class="btn btn-sm btn-danger">Logout</a>
                     </li>
                 <?php elseif (isLoggedIn() && isBuyer()): ?>
+                    <li><a href="<?= BASE_URL ?>/seller/">🏪 Toko Saya</a></li>
                     <li><a href="<?= BASE_URL ?>/buyer/">🏠 Home</a></li>
                     <li>
                         <a href="<?= BASE_URL ?>/buyer/cart.php" class="cart-link">
